@@ -32,4 +32,11 @@ case $IMG in
     ;;
 esac
 
+if [ ! -f $LOC ]; then
+  cat << ERR
+File not found (missed: $IMG)
+ERR
+  exit 0
+fi
+
 twurl -X POST "/1.1/statuses/update_with_media.json" --file "$LOC" --file-field 'media[]' -d "status=$TEXT"

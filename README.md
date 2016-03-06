@@ -48,12 +48,12 @@ tw-media <text> <image>
 
 the image on web is stored to `/tmp` by `wget`
 
-## `tw-rep-url`: post a reply with image
+## `tw-url-rep`: post a reply with image
 
 画像のurlを指定して画像付きでリプライをする
 
 ```bash
-tw-rep-url <scren_name> <status_id> <image-URL>
+tw-url-rep <scren_name> <status_id> <image-URL>
 ```
 
 `screen_name` and `status_id` is of the destination
