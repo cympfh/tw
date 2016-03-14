@@ -1,5 +1,24 @@
 #!/bin/bash
 
-twurl -X GET /1.1/statuses/home_timeline.json?count=199 |
-jq -r 'reverse | .[] | "\u001b[33m\(.user.name) \u001b[91m@\(.user.screen_name) \u001b[37m\(.id_str) \u001b[34mvia \(.source)\n \u001b[0m \(.text)"' |
-sed -e 's/<[^>]*>//g' -e 's/&lt;/</g' -e 's/&gt;/>/g'
+if [ "_$1" == "_-h" -o "_$1" == "_-?" -o "_$1" == "_--help" ]; then
+  echo << HELP
+Usage: tw-home
+  your home timeline
+Usage: tw-home <screen_name>
+  his or her timeline
+  screen_name is not beginning with @
+HELP
+  exit 0
+fi
+
+if [ $# == 0 ]; then
+  twurl -X GET /1.1/statuses/home_timeline.json?count=199 |
+  jq -r 'reverse | .[] | "\u001b[33m\(.user.name) \u001b[91m@\(.user.screen_name) \u001b[33m\(.created_at) \u001b[37m\(.id_str) \u001b[34mvia \(.source)\n \u001b[0m \(.text)"' |
+  sed -e 's/<[^>]*>//g' -e 's/&lt;/</g' -e 's/&gt;/>/g'
+else
+  USER=$1
+  twurl "/1.1/statuses/user_timeline.json?screen_name=${USER}&count=200" |
+  jq -r 'reverse | .[] | "\u001b[33m\(.user.name) \u001b[91m@\(.user.screen_name) \u001b[33m\(.created_at) \u001b[37m\(.id_str) \u001b[34mvia \(.source)\n \u001b[0m \(.text)"' |
+  sed -e 's/<[^>]*>//g' -e 's/&lt;/</g' -e 's/&gt;/>/g'
+fi
+

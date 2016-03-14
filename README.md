@@ -90,12 +90,29 @@ The following commands get your timeline of logined.
 Call without args.
 
 ### `tw-home`: home timeline
+
+call without args
+
+```sh
+tw-home
+```
+
 ### `tw-mentions`: mentions
 ### `tw-dms`: DMs
 
 ### `tw-stream`: UserStream
 
 `tw-stream` is unstable
+
+## Get someone's timeline
+
+call `tw-home` with an arg
+
+```sh
+tw-home <screen_name>
+```
+
+like `tw-home cympfh`
 
 ## `tw-fav-list`: Get your all favorites
 
