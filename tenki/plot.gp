@@ -24,4 +24,4 @@ plot 'data' every ::0::150 using 1:3 smooth csplines linestyle 1 lw 3 with fille
 set origin 0.5,0
 set format x "%m/%d      "
 set format y ""
-plot 'data' every ::150::156 using 1:3 smooth be linestyle 1 lw 3 with filledcurves
+plot 'data' every ::150::156 using 1:3 smooth csplines linestyle 1 lw 3 with filledcurves
