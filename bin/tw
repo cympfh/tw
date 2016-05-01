@@ -1,11 +1,92 @@
 #!/bin/bash
 
-if [ $# -gt 0 ]; then
-  msg=$@
-else
-  read msg
+## usage
+usage() {
+  cat << HELP
+Usage: tw [options] [<string>]
+
+tw posts <string> to Twitter.
+When - is specified as <string>, stdin is read.
+
+Options:
+  -f <image>      upload an image file, specified url or local-path
+  -r <status_id>  in_reply_to ("@screen_name" isnt appended automatically)
+                  (hint: <status_id> allows the url of a status)
+HELP
+}
+
+if [ $# -lt 1 -o "_$1" == "_-h" -o "_$1" == "_--help" -o "_$1" == "_-?" ]; then
+  usage
+  exit 0
+fi
+
+## global
+MEDIA=
+REPLY_TO=
+MSG=
+
+## parse args
+while [ "_$1" != "_" ]; do
+  case "$1" in
+    -f )
+      MEDIA=$2
+      shift 2
+      ;;
+    -r )
+      REPLY_TO=${2##*/}
+      shift 2
+      ;;
+    * )
+      if [ "_$MSG" == "_" ]; then
+        MSG="$1"
+      else
+        MSG="$MSG $1"
+      fi
+      shift
+      ;;
+  esac
+done
+
+## read stdin
+if [ "_$MSG" == "_-" ]; then
+  read MSG
   while read line; do
-    msg="$msg\n$line"
+    MSG="$MSG\n$line"
   done
 fi
-twurl -X POST "/1.1/statuses/update.json" -d "status=$msg"
+
+## download media
+if [ "_$MEDIA" != "_" ]; then
+  case $MEDIA in
+    http*)
+      LOC="/tmp/${MEDIA##*/}"
+      wget --quiet -O "$LOC" "$MEDIA"
+      ;;
+    *)
+      LOC=$MEDIA
+      ;;
+  esac
+
+  if [ ! -f "$LOC" ]; then
+    cat << ERR
+  File not found (missed: $IMG)
+ERR
+    exit 0
+  fi
+fi
+
+## post
+if [ "_$MEDIA" == "_" ]; then
+  if [ "_$REPLY_TO" == "_" ]; then
+    twurl -X POST "/1.1/statuses/update.json" -d "status=$MSG"
+  else
+    twurl -X POST "/1.1/statuses/update.json" -d "status=$MSG" -d "in_reply_to_status_id=$REPLY_TO"
+  fi
+else
+  if [ "_$REPLY_TO" == "_" ]; then
+    twurl -X POST "/1.1/statuses/update_with_media.json" --file "$LOC" --file-field "media[]" -d "status=$MSG"
+  else
+    twurl -X POST "/1.1/statuses/update_with_media.json" --file "$LOC" --file-field "media[]" -d "in_reply_to_status_id=$REPLY_TO" -d "status=$MSG"
+  fi
+fi
+

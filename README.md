@@ -7,26 +7,30 @@
     - commandline tool for Twitter API
 - jq: http://stedolan.github.io/jq/
     - json filter
-- PATH `./bin`
+- PATH to `./bin`
 
 ## `tw`: post
 
-```bash
-$ tw hoge hoge # post "hoge hoge"
-$ date | tw # post $(date)
+```
+   tw --help
+Usage: tw [options] [<string>]
+
+tw posts <string> to Twitter.
+When - is specified as <string>, stdin is read.
+
+Options:
+  -f <image>      upload an image file, specified url or local-path
+  -r <status_id>  in_reply_to ("@screen_name" isnt appended automatically)
+                  (hint: <status_id> allows the url of a status)
 ```
 
 ```bash
-$ tw
-a b
-c  d
-^D # post "a b\nc  d"
-```
-
-### post via vim
-
-```vim
-:w !tw
+tw abc  123 # post "abc 123"
+date | tw - # post $( date )
+tw -f http://example.com/awesome.gif # post an image
+tw -f ./lgtm.gif # post an image
+tw -r 111113000 "@my_friend lgtm" # post "@my_friend lgtm" to 111113000
+tw -r 111113000 -f ./lgtm "@my_friend"
 ```
 
 ### make your own tweet window
@@ -36,27 +40,6 @@ rlwrap sh -c 'while read a; do tw "$a"; done'
 ```
 
 type <Ctrl-D> to exit
-
-## `tw-media`: post with an image
-
-```bash
-tw-media <text> <image>
-```
-
-1. `text` can be ommited
-1. `image` is specified by URL or local path
-
-the image on web is stored to `/tmp` by `wget`
-
-## `tw-url-rep`: post a reply with image
-
-画像のurlを指定して画像付きでリプライをする
-
-```bash
-tw-url-rep <scren_name> <status_id> <image-URL>
-```
-
-`screen_name` and `status_id` is of the destination
 
 ## manage your accounts
 
@@ -133,14 +116,6 @@ tw-unfav <status_id>
 ```bash
 tw-follow <screen_name>
 tw-unfollow <screen_name>
-```
-
-## Post forecast of Hongo
-
-Get and post
-
-```bash
-tw-tenki
 ```
 
 ## Tips
