@@ -1,0 +1,8 @@
+#!/bin/sh
+
+usage() {
+  exit 0
+}
+[ $# -eq 0 ] && usage
+
+twurl -X POST "/1.1/statuses/retweet/${1}.json"
