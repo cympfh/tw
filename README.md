@@ -105,17 +105,25 @@ returns all favorites' `status_id`
 tw-fav-list
 ```
 
-## `tw-unfav`: destroy your favorite
+## Favorite (like) a tweet
 
 ```bash
-tw-unfav <status_id>
+tw-fav <status_id>
+tw-fav rm <status_id> # destroy!
+```
+
+## Retweet a tweet
+
+```bash
+tw-rt <status_id>
+tw-rt rm <status_id> # destroy!
 ```
 
 ## Make new friend and Destroy
 
 ```bash
 tw-follow <screen_name>
-tw-unfollow <screen_name>
+tw-follow rm <screen_name> # destroy!
 ```
 
 ## Tips

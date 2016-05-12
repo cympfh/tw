@@ -2,10 +2,10 @@
 
 usage() {
   cat << HELP
-Usage: tw-rt <status_id>
-  RT it
-Usage: tw-rt rm <status_id>
-  destroy RT of it
+Usage: tw-fav <status_id>
+  favorite it
+Usage: tw-fav rm <status_id>
+  destroy the favorite of it
 HELP
   exit 0
 }
@@ -15,9 +15,9 @@ if [ $# -eq 0 -o "$1" == "-h" -o "$1" == "--help" -o "$1" == "-?" ]; then
 fi
 
 if [ $# -eq 1 ]; then
-  twurl -X POST "/1.1/statuses/retweet/${1}.json"
+  twurl -X POST /1.1/favorites/create.json -d "id=$1"
 elif [ $# -eq 2 -a "$1" == "rm" ]; then
-  twurl -X POST "/1.1/statuses/unretweet/${2}.json"
+  twurl -X POST /1.1/favorites/destroy.json -d "id=$2"
 else
   usage
 fi

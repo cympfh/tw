@@ -15,7 +15,7 @@ Options:
 HELP
 }
 
-if [ $# -lt 1 -o "_$1" == "_-h" -o "_$1" == "_--help" -o "_$1" == "_-?" ]; then
+if [ $# -lt 1 -o "$1" == "-h" -o "$1" == "--help" -o "$1" == "-?" ]; then
   usage
   exit 0
 fi
