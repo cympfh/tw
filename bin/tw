@@ -12,11 +12,21 @@ Options:
   -f <image>      upload an image file, specified url or local-path
   -r <status_id>  in_reply_to ("@screen_name" isnt appended automatically)
                   (hint: <status_id> allows the url of a status)
+
+Usage: tw rm <status_id>
+
+remove the tweet
 HELP
 }
 
 if [ $# -lt 1 -o "$1" == "-h" -o "$1" == "--help" -o "$1" == "-?" ]; then
   usage
+  exit 0
+fi
+
+if [ $# -eq 2 -a "$1" == "rm" ]; then
+  ID=${2##*/}
+  twurl -XPOST "/1.1/statuses/destroy/${ID}.json"
   exit 0
 fi
 

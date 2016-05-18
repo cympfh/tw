@@ -41,6 +41,13 @@ rlwrap sh -c 'while read a; do tw "$a"; done'
 
 type <Ctrl-D> to exit
 
+## `tw rm`: remove
+
+```bash
+tw rm 732920478088617986
+tw rm https://twitter.com/cympfh/status/732920478088617986
+```
+
 ## manage your accounts
 
 ### `tw-auth`: add new account
