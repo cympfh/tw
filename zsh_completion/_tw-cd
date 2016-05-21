@@ -1,0 +1,5 @@
+#compdef tw-cd
+
+_tw-cd() {
+  _values users $(twurl accounts | awk 'NR%2==1' | tr '\n' ' ')
+}
