@@ -23,4 +23,10 @@ case $1 in
     ;;
 esac
 
-twurl -X POST -d image=$( cat $LOC |base64 -w0 ) "/1.1/account/update_profile_image.json"
+if [ "$(uname)" != "Darwin" ]; then
+  IMAGE=$(cat $LOC |base64 -w0)
+else
+  IMAGE=$(cat $LOC |base64)
+fi
+
+twurl -X POST -d "image=$IMAGE" /1.1/account/update_profile_image.json
