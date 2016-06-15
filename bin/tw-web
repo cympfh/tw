@@ -1,0 +1,17 @@
+#!/bin/bash
+
+usage() {
+  cat << HELP
+Usage: tw-web <url>
+  twit "TITLE URL"
+HELP
+  exit 0
+}
+
+URL=$1
+if [ -z "$URL" ]; then
+  usage
+fi
+
+TITLE=$(curl -s "$URL" | nkf | grep -A 3 '<title>' | tr -d '\n' | sed 's,.*<title>\(.*\)</title>.*,\1,')
+tw "$TITLE $URL"
