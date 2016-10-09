@@ -14,20 +14,19 @@ if [ $# -ne 0 ]; then
   exit 0
 fi
 
-TMP=`mktemp`
+TMP=$(mktemp)
 OPT=""
 
 while :; do
+    URL="/1.1/favorites/list.json?count=200${OPT}"
+    twurl "$URL" | jq -r '.[].id_str' > "$TMP"
+    if [ ! -s "$TMP" ]; then
+        break
+    else
+        NEXTID=$(ruby -e "p $(tail -1 "$TMP") - 1")
+        OPT="&max_id=${NEXTID}"
+        cat "$TMP"
+    fi
+done | sort -ur
 
-  twurl /1.1/favorites/list.json?count=200${OPT} >$TMP
-
-  cat $TMP | jq -r '.[].id_str'
-  if [ $( cat $TMP | jq -r '.[].id_str' | wc -l ) -eq 0 ]; then
-    break
-  else
-    OPT="&max_id=$(( $( cat $TMP | jq '.[].id' | tail -1 ) - 1 ))"
-  fi
-
-done | sort -r | uniq
-
-rm $TMP
+rm "$TMP"
