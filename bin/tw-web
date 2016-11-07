@@ -2,7 +2,7 @@
 
 usage() {
   cat << HELP
-Usage: tw-web <url>
+Usage: tw-web <url> [<comment>]
   twit "TITLE URL"
 HELP
   exit 0
@@ -14,4 +14,11 @@ if [ -z "$URL" ]; then
 fi
 
 TITLE=$(curl -s "$URL" | nkf | grep -A 3 '<title>' | tr -d '\n' | sed 's,.*<title>\(.*\)</title>.*,\1,')
-tw "$TITLE $URL"
+
+if [ "_$2" != "_" ]; then
+    COMMENT="$2 > "
+else
+    COMMENT=""
+fi
+
+tw "${COMMENT}${TITLE} ${URL}"
