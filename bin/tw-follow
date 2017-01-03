@@ -9,18 +9,46 @@ Usage: tw-follow https://twitter.com/<screen_name>
 Usage: tw-follow rm <screen_name>
 Usage: tw-follow rm https://twitter.com/<screen_name>
   unfollow the account
+
+Usage: tw-follow list [<screen_name>]
+  list of all your [his] friends
 HELP
   exit 0
 }
 
 if [ $# -eq 0 -o "$1" == "-h" -o "$1" == "--help" -o "$1" == "-?" ]; then
-  usage
+    usage
 fi
 
-if [ $# -eq 1 ]; then
-  twurl -X POST /1.1/friendships/create.json -d "screen_name=${1##*/}"
+follow() {
+    twurl -X POST /1.1/friendships/create.json -d "screen_name=${1##*/}"
+}
+
+unfollow() {
+    twurl -X POST /1.1/friendships/destroy.json -d "screen_name=${1##*/}"
+}
+
+friends() {
+    cursor=-1
+    tmp=$(mktemp)
+    while [ $? -eq 0 -a "$cursor" != "0" ]; do
+        twurl -X GET "/1.1/friends/list.json?count=200&cursor=$cursor&$opt" >"$tmp"
+        cursor=$(jq '.next_cursor' "$tmp")
+        paste <(jq -r '.users[].screen_name' "$tmp") <(jq -r '.users[].id_str' "$tmp")
+    done
+    rm "$tmp"
+}
+
+if [ "$1" == list ]; then
+    opt="skip_status=1"
+    if [ $# -eq 2 ]; then
+        opt="$opt&screen_name=$2"
+    fi
+    friends "$opt"
+elif [ $# -eq 1 ]; then
+    follow "$1"
 elif [ $# -eq 2 -a "$1" == "rm" ]; then
-  twurl -X POST /1.1/friendships/destroy.json -d "screen_name=${2##*/}"
+    unfollow "$2"
 else
-  usage
+    usage
 fi
