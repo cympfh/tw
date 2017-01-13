@@ -3,6 +3,7 @@
 usage() {
   cat << HELP
 Usage: tw-fav <status_id>
+Usage: tw-fav https://twitter.com/<screen_name>/status/<status_id>
   favorite it
 Usage: tw-fav rm <status_id>
   destroy the favorite of it
@@ -15,9 +16,9 @@ if [ $# -eq 0 -o "$1" == "-h" -o "$1" == "--help" -o "$1" == "-?" ]; then
 fi
 
 if [ $# -eq 1 ]; then
-  twurl -X POST /1.1/favorites/create.json -d "id=$1"
+    twurl -X POST /1.1/favorites/create.json -d "id=${1##*/}"
 elif [ $# -eq 2 -a "$1" == "rm" ]; then
-  twurl -X POST /1.1/favorites/destroy.json -d "id=$2"
+  twurl -X POST /1.1/favorites/destroy.json -d "id=${2##*/}"
 else
   usage
 fi
