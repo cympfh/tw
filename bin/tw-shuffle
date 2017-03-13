@@ -1,0 +1,3 @@
+#!/bin/bash
+
+echo "$@" | mecab -Owakati | tr ' ' '\n' | awk 'NF>0'  | shuf | tr -d '\n' | tw -
