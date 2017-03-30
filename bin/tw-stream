@@ -3,10 +3,25 @@
 while :; do
 twurl -t -A 'Accept-Encoding: text' -H userstream.twitter.com /1.1/user.json 2>/dev/null |
 grep --line-buffered '^{' |
-jq -r 'if has("text") then "\u001b[33m\(.user.name) \u001b[91m@\(.user.screen_name) \u001b[37m\(.id_str)\n \u001b[0m \(.text)" else "" end'
+jq -r '
+    if has("friends") then
+        "hello"
+    elif has("text") then
+        "\u001b[33m\(.user.name) \u001b[91m@\(.user.screen_name) \u001b[37m\(.id_str)\n \u001b[0m \(.text)"
+    elif has("delete") then
+        "\u001b[41;30mdeleted\u001b[0m: \(.delete.status.id_str)"
+    elif has("event") and .event == "follow" then
+        "\u001b[33m\(.source.name) \u001b[91m@\(.source.screen_name)\u001b[0m followed \u001b[33m\(.target.name) \u001b[91m@\(.target.screen_name)\u001b[0m"
+    elif has("event") and .event == "unfollow" then
+        "\u001b[33m\(.source.name) \u001b[91m@\(.source.screen_name)\u001b[0m stopped following \u001b[33m\(.target.name) \u001b[91m@\(.target.screen_name)\u001b[0m"
+    elif has("event") and .event == "favorite" then
+        "\u001b[33m\(.source.name) \u001b[91m@\(.source.screen_name)\u001b[0m likes \u001b[33m\(.target.name) \u001b[91m@\(.target.screen_name)\u001b[0m: \(.target_object.text)"
+    elif has("event") and .event == "unfavorite" then
+        "\u001b[33m\(.source.name) \u001b[91m@\(.source.screen_name)\u001b[0m does not like \u001b[33m\(.target.name) \u001b[91m@\(.target.screen_name)\u001b[0m: \(.target_object.text)"
+    else
+        .
+    end'
+
+echo 'Connection reset'
 sleep 1
 done
-
-# jq -r 'if has("text") then "\u001b[33m\(.user.name) \u001b[91m@\(.user.screen_name) \u001b[37m\(.id_str) \u001b[34mvia \(.source)\n \u001b[0m \(.text)" else "" end'
-#awk '{gsub(/<[^>]*>/, "", $0); gsub("&lt;", "<", $0); gsub("&gt;", ">", $0); print $0; fflush()}'
-#sed -u 's/<[^>]*>//g' | sed -u 's/&lt;/</g' | sed -u 's/&gt;/>/g'
