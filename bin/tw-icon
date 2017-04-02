@@ -8,6 +8,11 @@ image is specified by url or local-path
 HELP
 }
 
+resize() {
+    convert -geometry 400x400 "$1" /tmp/replace
+    mv /tmp/replace "$1"
+}
+
 if [ $# -lt 1 -o "_$1" == "_-h" -o "_$1" == "_-?" ]; then
   usage
   exit 0
@@ -16,12 +21,14 @@ fi
 case $1 in
   http*)
     LOC="/tmp/${1##*/}"
-    wget --quiet -O $LOC $1
+    wget --quiet -O "$LOC" "$1"
     ;;
   *)
     LOC=$1
     ;;
 esac
+
+resize "$LOC"
 
 if [ "$(uname)" != "Darwin" ]; then
   IMAGE=$(cat $LOC |base64 -w0)
