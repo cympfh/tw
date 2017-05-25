@@ -7,7 +7,7 @@ jq -r '
     if has("friends") then
         "hello"
     elif has("text") then
-        "\u001b[33m\(.user.name) \u001b[91m@\(.user.screen_name) \u001b[37m\(.id_str)\n \u001b[0m \(.text)"
+        "\u001b[33m\(.user.name) \u001b[91m@\(.user.screen_name) \u001b[33m\(.created_at) \u001b[37m\(.id_str)\n \u001b[0m \(.text)"
     elif has("delete") then
         "\u001b[41;30mdeleted\u001b[0m: \(.delete.status.id_str)"
     elif has("event") and .event == "follow" then
@@ -18,8 +18,12 @@ jq -r '
         "\u001b[33m\(.source.name) \u001b[91m@\(.source.screen_name)\u001b[0m likes \u001b[33m\(.target.name) \u001b[91m@\(.target.screen_name)\u001b[0m: \(.target_object.text)"
     elif has("event") and .event == "unfavorite" then
         "\u001b[33m\(.source.name) \u001b[91m@\(.source.screen_name)\u001b[0m does not like \u001b[33m\(.target.name) \u001b[91m@\(.target.screen_name)\u001b[0m: \(.target_object.text)"
+    elif has("event") and .event == "retweeted_retweet" then
+        empty
+    elif has("event") and .event == "favorited_retweet" then
+        empty
     else
-        .
+        empty
     end'
 
 echo 'Connection reset'
