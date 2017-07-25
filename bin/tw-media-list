@@ -2,16 +2,17 @@
 
 usage() {
   cat << HELP
-Usage: tw-media-list <id>
+Usage: tw-media-list <status-url>
 
-id is of a status.
-Get urls of images in the status.
+<status-url> should be like
+https://twitter.com/{username}/status/{status_id}
 HELP
 }
 
-if [ $# -lt 1 -o "_$1" == "_-h" -o "_$1" == "_-?" ]; then
-  usage
-  exit 0
+if [ $# -eq 0 ]; then
+    URL=$(cat)
+else
+    URL=$1
 fi
 
-twurl /1.1/statuses/show.json?id=$1 | jq -r '.extended_entities.media[].media_url_https'
+curl -s "$URL" | grep 'og:image' | grep -o 'content="[^"]*"' | sed 's/^[^"]*"//g; s/"$//g' | grep ^http
