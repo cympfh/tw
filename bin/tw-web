@@ -46,7 +46,7 @@ if [ -z "$URL" ]; then
 fi
 
 # fetch title
-TITLE=$(curl -s "$URL" | nkf | grep -A 3 '<title>' | tr -d '\n' | sed 's,.*<title>\(.*\)</title>.*,\1,')
+TITLE=$(curl -s "$URL" | nkf | grep -A 3 '<title>' | sed 's,.*<title>\(.*\)</title>.*,\1,' | sed 's/^ *//g; s/ *$//g' | head -1)
 
 if [ "_$MSG" != "_" ]; then
     MSG="$MSG > "
