@@ -2,23 +2,60 @@
 
 usage() {
   cat << HELP
-Usage: tw-web <url> [<comment>]
+SYNOPSIS: tw-web [-n] <url> [<comment>]
   twit "TITLE URL"
+
+OPTIONS
+  -n  dry-run
 HELP
   exit 0
 }
 
-URL=$1
+# globals
+DRYRUN=0
+URL=
+MSG=
+
+# parse args
+while [ "_$1" != "_" ]; do
+  case "$1" in
+      -h | --help )
+          usage
+          ;;
+      -n )
+          DRYRUN=1
+          shift
+          ;;
+      http://* | https://* )
+          URL=$1
+          shift
+          ;;
+      * )
+          if [ "_$MSG" == "_" ]; then
+              MSG="$1"
+          else
+              MSG="$MSG $1"
+          fi
+          ;;
+  esac
+done
+
+# failed
 if [ -z "$URL" ]; then
-  usage
+    usage
 fi
 
+# fetch title
 TITLE=$(curl -s "$URL" | nkf | grep -A 3 '<title>' | tr -d '\n' | sed 's,.*<title>\(.*\)</title>.*,\1,')
 
-if [ "_$2" != "_" ]; then
-    COMMENT="$2 > "
+if [ "_$MSG" != "_" ]; then
+    MSG="$MSG > "
 else
-    COMMENT=""
+    MSG=""
 fi
 
-tw "${COMMENT}${TITLE} ${URL}"
+if [ $DRYRUN -eq 0 ]; then
+    tw "${COMMENT}${TITLE} ${URL}"
+else
+    echo tw "${COMMENT}${TITLE} ${URL}"
+fi
