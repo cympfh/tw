@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if which mecab > /dev/null; then
+    echo "$@" | mecab -Owakati | tw -
+else
+    echo "Please install mecab"
+    exit 1
+fi
