@@ -1,3 +1,30 @@
 #!/bin/bash
 
-twurl authorize -c qnNRwjeo8zFjhIDfgG1F6Q -s JtKRv1e9QIEG6mKvWl0g4ygGVGzWclgfd7GaSBEGtg
+usage() {
+  cat << HELP
+Usage: tw-auth [-k CONSUMER_KEY] [-s CONSUMER_SECRET]
+HELP
+  exit 0
+}
+
+if [ "$1" == "-h" -o "$1" == "--help" -o "$1" == "-?" ]; then
+  usage
+fi
+
+CONSUMER_KEY=qnNRwjeo8zFjhIDfgG1F6Q
+CONSUMER_SECRET=JtKRv1e9QIEG6mKvWl0g4ygGVGzWclgfd7GaSBEGtg
+
+while [ "_$1" != "_" ]; do
+    case "$1" in
+        -k )
+            CONSUMER_KEY=$2
+            shift 2
+            ;;
+        -s )
+            CONSUMER_SECRET=$2
+            shift 2
+            ;;
+    esac
+done
+
+twurl authorize -c "$CONSUMER_KEY" -s "$CONSUMER_SECRET"
