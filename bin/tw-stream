@@ -22,6 +22,9 @@ jq -r '
         empty
     elif has("event") and .event == "favorited_retweet" then
         empty
+    elif has("direct_message") then
+        .direct_message |
+        "\u001b[7mDM\u001b[0m \u001b[33m\(.sender.name) \u001b[91m@\(.sender.screen_name) \u001b[33m\(.sender.created_at) \u001b[37m\(.id_str)\n \u001b[0m \(.text)"
     else
         empty
     end'
