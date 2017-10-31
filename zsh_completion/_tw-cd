@@ -3,3 +3,5 @@
 _tw-cd() {
   _values users $(twurl accounts | awk 'NR%2==1' | tr '\n' ' ')
 }
+
+_tw-cd "$@"
