@@ -2,9 +2,12 @@
 
 usage() {
   cat << HELP
-Usage: tw-follow <screen_name>
-Usage: tw-follow https://twitter.com/<screen_name>
+Usage: tw-follow [OPTIONS] <screen_name>
+Usage: tw-follow [OPTIONS] https://twitter.com/<screen_name>
   follow the account
+
+  OPTIONS:
+    --no-rt: disable RTs
 
 Usage: tw-follow rm <screen_name>
 Usage: tw-follow rm https://twitter.com/<screen_name>
@@ -16,12 +19,28 @@ HELP
   exit 0
 }
 
-if [ $# -eq 0 -o "$1" == "-h" -o "$1" == "--help" -o "$1" == "-?" ]; then
-    usage
-fi
-
 follow() {
-    twurl -X POST /1.1/friendships/create.json -d "screen_name=${1##*/}"
+    RT=true
+    NAME=
+    while [ $# -ge 1 ]; do
+        case "$1" in
+            --no-rt )
+                RT=false
+                ;;
+            * )
+                NAME=${1##*/}
+                ;;
+        esac
+        shift
+    done
+
+    echo following...
+    twurl -X POST /1.1/friendships/create.json -d "screen_name=$NAME" >/dev/null
+
+    if [ $RT = false ]; then
+        echo make disalbe RTs
+        twurl -X POST /1.1/friendships/update.json -d "screen_name=$NAME&retweets=false" >/dev/null
+    fi
 }
 
 unfollow() {
@@ -39,16 +58,31 @@ friends() {
     rm "$tmp"
 }
 
-if [ "$1" == list ]; then
+if [ $# -eq 0 ]; then
+    usage
+fi
+
+case "$1" in
+
+-h | --help )
+    usage
+    ;;
+
+list )
     opt="skip_status=1"
     if [ $# -eq 2 ]; then
         opt="$opt&screen_name=$2"
     fi
     friends "$opt"
-elif [ $# -eq 1 ]; then
-    follow "$1"
-elif [ $# -eq 2 -a "$1" == "rm" ]; then
+    ;;
+
+rm )
     unfollow "$2"
-else
-    usage
-fi
+    ;;
+
+
+* )
+    follow "$@"
+    ;;
+
+esac
