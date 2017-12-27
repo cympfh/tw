@@ -11,6 +11,15 @@ HELP
   exit 0
 }
 
+get-title() {
+    curl -s "$URL" | nkf |
+    sed 's/TITLE/title/gi' |
+    grep -A 10 '<title>' |
+    tr '\n' ' ' |
+    sed 's,.*<title>\(.*\)</title>.*,\1,' |
+    sed 's/^ *//g; s/ *$//g'
+}
+
 # globals
 DRYRUN=0
 URL=
@@ -46,7 +55,7 @@ if [ -z "$URL" ]; then
 fi
 
 # fetch title
-TITLE=$(curl -s "$URL" | nkf | grep -A 3 '<title>' | sed 's,.*<title>\(.*\)</title>.*,\1,' | sed 's/^ *//g; s/ *$//g' | head -1)
+TITLE=$(get-title "$1")
 
 if [ "_$MSG" != "_" ]; then
     MSG="$MSG > "
