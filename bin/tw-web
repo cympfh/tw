@@ -14,6 +14,8 @@ HELP
 get-title() {
     curl -s "$URL" | nkf |
     sed 's/TITLE/title/gi' |
+    grep -A 100000 '<head' |
+    grep -B 100000 '</head>' |
     grep -A 10 '<title>' |
     tr '\n' ' ' |
     sed 's,.*<title>\(.*\)</title>.*,\1,' |
