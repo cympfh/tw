@@ -65,6 +65,11 @@ if [ "_$MSG" == "_-" ]; then
   done
 fi
 
+## encoding
+if ( which uri-encode >/dev/null ); then
+    MSG="$( uri-encode "$MSG" )"
+fi
+
 ## download media
 if [ "_$MEDIA" != "_" ]; then
   case $MEDIA in
@@ -88,15 +93,15 @@ fi
 ## post
 if [ "_$MEDIA" == "_" ]; then
   if [ "_$REPLY_TO" == "_" ]; then
-    twurl -X POST "/1.1/statuses/update.json" -d "status=$MSG"
+    twurl -X POST "/1.1/statuses/update.json" -r "status=$MSG"
   else
-    twurl -X POST "/1.1/statuses/update.json" -d "status=$MSG" -d "in_reply_to_status_id=$REPLY_TO"
+    twurl -X POST "/1.1/statuses/update.json" -r "status=$MSG" -d "in_reply_to_status_id=$REPLY_TO"
   fi
 else
   if [ "_$REPLY_TO" == "_" ]; then
-    twurl -X POST "/1.1/statuses/update_with_media.json" --file "$LOC" --file-field "media[]" -d "status=$MSG"
+    twurl -X POST "/1.1/statuses/update_with_media.json" --file "$LOC" --file-field "media[]" -r "status=$MSG"
   else
-    twurl -X POST "/1.1/statuses/update_with_media.json" --file "$LOC" --file-field "media[]" -d "in_reply_to_status_id=$REPLY_TO" -d "status=$MSG"
+    twurl -X POST "/1.1/statuses/update_with_media.json" --file "$LOC" --file-field "media[]" -r "in_reply_to_status_id=$REPLY_TO" -d "status=$MSG"
   fi
 fi
 
