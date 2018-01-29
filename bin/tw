@@ -19,6 +19,7 @@ remove the tweet
 HELP
 }
 
+## args
 if [ $# -lt 1 -o "$1" == "-h" -o "$1" == "--help" -o "$1" == "-?" ]; then
   usage
   exit 0
@@ -48,9 +49,9 @@ while [ "_$1" != "_" ]; do
       ;;
     * )
       if [ "_$MSG" == "_" ]; then
-        MSG="$1"
+          MSG="$1"
       else
-        MSG="$MSG $1"
+          MSG="$MSG $1"
       fi
       shift
       ;;
@@ -59,15 +60,12 @@ done
 
 ## read stdin
 if [ "_$MSG" == "_-" ]; then
-  read MSG
-  while read line; do
-    MSG="$MSG\n$line"
-  done
-fi
-
-## encoding
-if ( which uri-encode >/dev/null ); then
-    MSG="$( uri-encode "$MSG" )"
+    TMP=$(mktemp)
+    cat >"$TMP"
+    MSG="$(uri-encode <"$TMP")"
+    rm "$TMP"
+else
+    MSG="$(uri-encode "$MSG")"
 fi
 
 ## download media
