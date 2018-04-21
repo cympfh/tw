@@ -1,0 +1,47 @@
+#!/bin/bash
+
+usage() {
+    cat <<EOM
+SYNOPSYS
+  tw-img-dl [OPTIONS] <status-ID-or-URL>
+
+OPTIONS
+  -4
+  --large, -L      appends ":large" to url
+  --help, -h       prints this
+EOM
+    exit
+}
+
+WGET_OPTS=
+LARGE=
+ID=
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -4 )
+            WGET_OPTS="-4 $WGET_OPTS"
+            ;;
+        --large | -L )
+            LARGE=":large"
+            ;;
+        -4L | -L4 )
+            WGET_OPTS="-4 $WGET_OPTS"
+            LARGE=":large"
+            ;;
+        -h | --help )
+            usage
+            ;;
+        * )
+            ID=${1##*/}
+            ;;
+    esac
+    shift
+done
+
+[ -z "$ID" ] && usage
+
+twurl "/1.1/statuses/show.json?id=${ID}" |
+jq -r '.extended_entities.media[].media_url_https' |
+sed "s/.*/wget ${WGET_OPTS} &${LARGE}/" |
+sh
