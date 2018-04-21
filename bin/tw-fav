@@ -2,23 +2,54 @@
 
 usage() {
   cat << HELP
-Usage: tw-fav <status_id>
-Usage: tw-fav https://twitter.com/<screen_name>/status/<status_id>
+Usage: tw-fav [--by <name>] <status_id>
+Usage: tw-fav [--by <name>] https://twitter.com/<screen_name>/status/<status_id>
   favorite it
-Usage: tw-fav rm <status_id>
+Usage: tw-fav rm [--by <name>] <status_id>
   destroy the favorite of it
 HELP
   exit 0
 }
 
-if [ $# -eq 0 -o "$1" == "-h" -o "$1" == "--help" -o "$1" == "-?" ]; then
-  usage
+RM=0
+BY=
+ID=
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --by )
+            BY=$2
+            shift 2
+            ;;
+        rm )
+            RM=1
+            shift
+            ;;
+        -h | --help )
+            usage
+            ;;
+        * )
+            ID="${1##*/}"
+            shift
+            ;;
+    esac
+done
+
+if [ -z "$ID" ]; then
+    usage
 fi
 
-if [ $# -eq 1 ]; then
-    twurl -X POST /1.1/favorites/create.json -d "id=${1##*/}"
-elif [ $# -eq 2 -a "$1" == "rm" ]; then
-  twurl -X POST /1.1/favorites/destroy.json -d "id=${2##*/}"
+if [ ! -z "$BY" ]; then
+    tw-lock
+    tw-cd "$BY"
+fi
+
+if [ $RM -eq 0 ]; then
+    twurl -X POST /1.1/favorites/create.json -d "id=$ID"
 else
-  usage
+    twurl -X POST /1.1/favorites/destroy.json -d "id=$ID"
+fi
+
+if [ ! -z "$BY" ]; then
+    tw-lock -u
 fi

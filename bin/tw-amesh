@@ -2,7 +2,7 @@
 
 if which amesh > /dev/null; then
     amesh
-    tw -f /tmp/amesh.jpg
+    tw -f /tmp/amesh.jpg "$@"
 else
     echo "Please install amesh"
     exit 1

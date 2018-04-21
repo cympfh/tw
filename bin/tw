@@ -3,19 +3,20 @@
 ## usage
 usage() {
   cat << HELP
-Usage: tw [options] [<string>]
+Usage: tw [OPTIONS] [<string>]
 
-tw posts <string> to Twitter.
-When - is specified as <string>, stdin is read.
+  tw posts <string> to Twitter.
+  When - is specified as <string>, stdin is read.
 
-Options:
-  -f <image>      upload an image file, specified url or local-path
-  -r <status_id>  in_reply_to ("@screen_name" isnt appended automatically)
-                  (hint: <status_id> allows the url of a status)
+  OPTIONS:
+    -f <image>         upload an image file, specified url or local-path
+    -r <status_id>     in_reply_to ("@screen_name" isnt appended automatically)
+                       (hint: <status_id> allows the url of a status)
+    --by <scren_name>  tweet with the account (this get a mutex lock (tw-lock))
 
 Usage: tw rm <status_id>
 
-remove the tweet
+  remove the tweet
 HELP
 }
 
@@ -35,6 +36,7 @@ fi
 MEDIA=
 REPLY_TO=
 MSG=
+BY=
 
 ## parse args
 while [ "_$1" != "_" ]; do
@@ -45,6 +47,10 @@ while [ "_$1" != "_" ]; do
       ;;
     -r )
       REPLY_TO=${2##*/}
+      shift 2
+      ;;
+  --by )
+      BY=$2
       shift 2
       ;;
     * )
@@ -89,6 +95,13 @@ ERR
 fi
 
 ## post
+
+if [ ! -z "$BY" ]; then
+    echo lock $BY
+    tw-lock
+    tw-cd "$BY"
+fi
+
 if [ "_$MEDIA" == "_" ]; then
   if [ "_$REPLY_TO" == "_" ]; then
     twurl -X POST "/1.1/statuses/update.json" -r "status=$MSG"
@@ -103,3 +116,7 @@ else
   fi
 fi
 
+if [ ! -z "$BY" ]; then
+    tw-lock -u
+    echo release
+fi
