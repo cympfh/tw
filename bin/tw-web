@@ -11,17 +11,6 @@ HELP
   exit 0
 }
 
-get-title() {
-    curl -s "$URL" | nkf |
-    sed 's/TITLE/title/gi' |
-    grep -A 100000 '<head' |
-    grep -B 100000 '</head>' |
-    grep -A 10 '<title>' |
-    tr '\n' ' ' |
-    sed 's,.*<title>\(.*\)</title>.*,\1,' |
-    sed 's/^ *//g; s/ *$//g'
-}
-
 # globals
 DRYRUN=0
 URL=
@@ -33,7 +22,7 @@ while [ "_$1" != "_" ]; do
       -h | --help )
           usage
           ;;
-      -n )
+      -N | -n )
           DRYRUN=1
           shift
           ;;
@@ -47,6 +36,7 @@ while [ "_$1" != "_" ]; do
           else
               MSG="$MSG $1"
           fi
+          shift
           ;;
   esac
 done
@@ -57,7 +47,7 @@ if [ -z "$URL" ]; then
 fi
 
 # fetch title
-TITLE=$(get-title "$1")
+TITLE=$(html-title "$URL")
 
 if [ "_$MSG" != "_" ]; then
     MSG="$MSG > "
@@ -66,7 +56,7 @@ else
 fi
 
 if [ $DRYRUN -eq 0 ]; then
-    tw "${COMMENT}${TITLE} ${URL}"
+    tw "${MSG}\"${TITLE}\" ${URL}"
 else
-    echo tw "${COMMENT}${TITLE} ${URL}"
+    echo tw "${MSG}\"${TITLE}\" ${URL}"
 fi
