@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if which amesh > /dev/null; then
-    amesh
+    amesh -A
     tw -f /tmp/amesh.gif "$@"
 else
     echo "Please install amesh"
